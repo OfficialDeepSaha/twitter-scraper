@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Scraper - Results</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body>
+    <div class="container py-5">
+        <header class="text-center mb-5">
+            <h1 class="display-4"><i class="fab fa-twitter text-info me-2"></i>Twitter Scraper</h1>
+            <p class="lead">Search Results</p>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h3>Search Summary</h3>
+                    <a href="{{ url_for('index') }}" class="btn btn-secondary">
+                        <i class="fas fa-search me-2"></i>New Search
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Search Type:</strong> {{ search_type.capitalize() }}</p>
+                        <p><strong>Query:</strong> {{ query }}</p>
+                        <p><strong>Total Tweets:</strong> {{ count }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if stats %}
+                        <p><strong>Average Likes:</strong> {{ "%.2f"|format(stats.average_likes) }}</p>
+                        <p><strong>Average Retweets:</strong> {{ "%.2f"|format(stats.average_retweets) }}</p>
+                        <p><strong>Average Replies:</strong> {{ "%.2f"|format(stats.average_replies) }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{{ url_for('download', format='csv') }}" class="btn btn-success">
+                        <i class="fas fa-file-csv me-2"></i>Download CSV
+                    </a>
+                    <a href="{{ url_for('download', format='json') }}" class="btn btn-info">
+                        <i class="fas fa-file-code me-2"></i>Download JSON
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        {% if stats and count > 0 %}
+        <div class="card shadow-sm mb-4">
+            <div class="card-header">
+                <h3>Tweet Statistics</h3>
+            </div>
+            <div class="card-body">
+                <div class="row mb-4">
+                    <div class="col-md-4">
+                        <div class="card bg-primary text-white">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Average Likes</h5>
+                                <p class="display-4">{{ "%.1f"|format(stats.average_likes) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-success text-white">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Average Retweets</h5>
+                                <p class="display-4">{{ "%.1f"|format(stats.average_retweets) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card bg-info text-white">
+                            <div class="card-body text-center">
+                                <h5 class="card-title">Average Replies</h5>
+                                <p class="display-4">{{ "%.1f"|format(stats.average_replies) }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {% if stats.most_liked_tweet %}
+                <div class="mb-4">
+                    <h5>Most Liked Tweet</h5>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="card-text">{{ stats.most_liked_tweet }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+
+                {% if stats.most_retweeted_tweet %}
+                <div class="mb-4">
+                    <h5>Most Retweeted Tweet</h5>
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="card-text">{{ stats.most_retweeted_tweet }}</p>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        {% endif %}
+
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3>Tweets ({{ count }})</h3>
+            </div>
+            <div class="card-body">
+                {% if count > 0 %}
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>User</th>
+                                    <th>Content</th>
+                                    <th>Likes</th>
+                                    <th>Retweets</th>
+                                    <th>Replies</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for tweet in tweets %}
+                                <tr>
+                                    <td>{{ tweet.date|truncate(19, True, '') }}</td>
+                                    <td>@{{ tweet.user }}</td>
+                                    <td>{{ tweet.content|truncate(100) }}</td>
+                                    <td>{{ tweet.like_count }}</td>
+                                    <td>{{ tweet.retweet_count }}</td>
+                                    <td>{{ tweet.reply_count }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="alert alert-warning">
+                        No tweets found matching your search criteria.
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-center text-white-50 py-4 mt-5">
+        <div class="container">
+            <p>Twitter Scraper using snscrape package | Built with Python and Flask</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

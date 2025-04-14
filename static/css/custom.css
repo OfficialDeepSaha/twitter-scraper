@@ -1,0 +1,53 @@
+/* Custom styles to complement the bootstrap theme */
+
+.bg-dark {
+    background-color: var(--bs-dark) !important;
+}
+
+code {
+    color: var(--bs-info);
+    background-color: var(--bs-dark);
+    padding: 2px 4px;
+    border-radius: 4px;
+}
+
+.card {
+    background-color: var(--bs-body-bg);
+    border: 1px solid var(--bs-border-color);
+}
+
+.card-header {
+    background-color: rgba(var(--bs-dark-rgb), 0.05);
+}
+
+.table {
+    color: var(--bs-body-color);
+}
+
+/* Increase the space between sections */
+.card {
+    margin-bottom: 2rem;
+}
+
+/* Make buttons more consistent */
+.btn {
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+}
+
+/* Better focus states for accessibility */
+:focus {
+    outline: 3px solid var(--bs-primary);
+    outline-offset: 2px;
+}
+
+/* Improve table cell padding */
+.table td, .table th {
+    padding: 0.75rem;
+    vertical-align: middle;
+}
+
+/* Style code examples */
+.bg-dark pre {
+    margin-bottom: 0;
+}

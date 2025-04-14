@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Twitter Scraper</title>
+    <link rel="stylesheet" href="https://cdn.replit.com/agent/bootstrap-agent-dark-theme.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+</head>
+<body>
+    <div class="container py-5">
+        <header class="text-center mb-5">
+            <h1 class="display-4"><i class="fab fa-twitter text-info me-2"></i>Twitter Scraper</h1>
+            <p class="lead">Extract tweets based on keywords, hashtags, and user accounts</p>
+        </header>
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% if error %}
+            <div class="alert alert-danger" role="alert">
+                {{ error }}
+            </div>
+        {% endif %}
+
+        <div class="card shadow-sm mb-5">
+            <div class="card-header">
+                <h3>Search Parameters</h3>
+            </div>
+            <div class="card-body">
+                <form action="{{ url_for('search') }}" method="post">
+                    <div class="mb-3">
+                        <label for="search_type" class="form-label">Search Type</label>
+                        <select class="form-select" id="search_type" name="search_type" required>
+                            <option value="keyword">Keyword</option>
+                            <option value="hashtag">Hashtag</option>
+                            <option value="user">User</option>
+                        </select>
+                        <div class="form-text" id="search_type_help">
+                            Search by keyword, hashtag, or user account
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="query" class="form-label">Search Query</label>
+                        <input type="text" class="form-control" id="query" name="query" placeholder="Enter search term" required>
+                        <div class="form-text" id="query_help">
+                            For hashtags, the # symbol is optional. For users, the @ symbol is optional.
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="limit" class="form-label">Tweet Limit</label>
+                        <input type="number" class="form-control" id="limit" name="limit" min="1" max="1000" value="100">
+                        <div class="form-text">
+                            Maximum number of tweets to retrieve (1-1000)
+                        </div>
+                    </div>
+
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <label for="start_date" class="form-label">Start Date</label>
+                            <input type="date" class="form-control" id="start_date" name="start_date">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="end_date" class="form-label">End Date</label>
+                            <input type="date" class="form-control" id="end_date" name="end_date">
+                        </div>
+                        <div class="form-text">
+                            Optional date range for filtering tweets
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="lang" class="form-label">Language</label>
+                        <select class="form-select" id="lang" name="lang">
+                            <option value="">All Languages</option>
+                            <option value="en">English</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                            <option value="de">German</option>
+                            <option value="it">Italian</option>
+                            <option value="ja">Japanese</option>
+                            <option value="ko">Korean</option>
+                            <option value="pt">Portuguese</option>
+                            <option value="ru">Russian</option>
+                            <option value="zh">Chinese</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="file_format" class="form-label">File Format</label>
+                        <select class="form-select" id="file_format" name="file_format">
+                            <option value="csv">CSV</option>
+                            <option value="json">JSON</option>
+                        </select>
+                    </div>
+
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-search me-2"></i>Search Tweets
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header">
+                <h3>Command-Line Usage Examples</h3>
+            </div>
+            <div class="card-body">
+                <div class="mb-4">
+                    <h5>Search by Keyword</h5>
+                    <div class="bg-dark p-3 rounded">
+                        <code>python twitter_scraper.py keyword "climate change" --limit 100 --start-date 2023-01-01 --end-date 2023-06-30 --lang en --format csv</code>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h5>Search by Hashtag</h5>
+                    <div class="bg-dark p-3 rounded">
+                        <code>python twitter_scraper.py hashtag "AI" --limit 50 --format json</code>
+                    </div>
+                </div>
+
+                <div class="mb-4">
+                    <h5>Search by User</h5>
+                    <div class="bg-dark p-3 rounded">
+                        <code>python twitter_scraper.py user "elonmusk" --limit 200</code>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <footer class="bg-dark text-center text-white-50 py-4 mt-5">
+        <div class="container">
+            <p>Twitter Scraper using snscrape package | Built with Python and Flask</p>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
