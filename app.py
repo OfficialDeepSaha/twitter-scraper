@@ -3,13 +3,34 @@ import json
 from flask import Flask, render_template, request, redirect, url_for, send_file, flash, session
 from twitter_scraper import TwitterScraper
 import logging
+from flask_sqlalchemy import SQLAlchemy
+from sqlalchemy.orm import DeclarativeBase
+from datetime import datetime
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Create Flask app
+# Create Flask app and database setup
+class Base(DeclarativeBase):
+    pass
+
+db = SQLAlchemy(model_class=Base)
+
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "twitter-scraper-secret-key")
+
+# Configure the database
+db_url = os.environ.get("DATABASE_URL")
+if db_url is None:
+    db_url = "sqlite:///twitter_scraper.db"  # Fallback to SQLite if no DB URL is provided
+    
+app.config["SQLALCHEMY_DATABASE_URI"] = db_url
+app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
+    "pool_recycle": 300,
+    "pool_pre_ping": True,
+}
+# Initialize the app with the database extension
+db.init_app(app)
 
 # Initialize the scraper
 scraper = TwitterScraper()
