@@ -1,7 +1,7 @@
 import os
 import json
 from flask import Flask, render_template, request, redirect, url_for, send_file, flash, session
-from twitter_scraper import TwitterScraper
+from twitter_scraper_module import TwitterScraper
 import logging
 from database import db, init_db
 from datetime import datetime
