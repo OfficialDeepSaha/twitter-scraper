@@ -56,6 +56,21 @@ def search():
         return redirect(url_for('index'))
     
     try:
+        # Import here to avoid circular imports
+        from models import Search, Tweet
+        
+        # Create a new search record in the database
+        search_record = Search(
+            search_type=search_type,
+            query=query,
+            limit=limit,
+            start_date=start_date,
+            end_date=end_date,
+            lang=lang
+        )
+        db.session.add(search_record)
+        db.session.commit()
+        
         # Perform search based on search type
         if search_type == 'keyword':
             df = scraper.search_by_keyword(query, limit, start_date, end_date, lang)
@@ -78,14 +93,38 @@ def search():
             'start_date': start_date,
             'end_date': end_date,
             'lang': lang,
-            'file_format': file_format
+            'file_format': file_format,
+            'search_id': search_record.id
         }
         
         # Convert DataFrame to list of dicts for template
         tweets = df.to_dict('records')
+        
+        # Store tweets in the database
         for tweet in tweets:
+            # Check if this tweet already exists in the database
+            existing_tweet = Tweet.query.get(str(tweet['id']))
+            if not existing_tweet:
+                new_tweet = Tweet(
+                    id=str(tweet['id']),
+                    date=tweet['date'],
+                    content=tweet['content'],
+                    user=tweet['user'],
+                    url=tweet['url'],
+                    reply_count=tweet['reply_count'],
+                    retweet_count=tweet['retweet_count'],
+                    like_count=tweet['like_count'],
+                    quote_count=tweet['quote_count'],
+                    search_id=search_record.id
+                )
+                db.session.add(new_tweet)
+            
+            # Format date for display
             if 'date' in tweet and hasattr(tweet['date'], 'isoformat'):
                 tweet['date'] = tweet['date'].isoformat()
+        
+        # Commit all the new tweets to the database
+        db.session.commit()
         
         # Render results page
         return render_template('results.html', 

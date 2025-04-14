@@ -1,0 +1,84 @@
+# Twitter Scraper Deployment Package
+
+## Required Files
+
+### Python Files:
+- app.py - Main Flask application
+- main.py - Entry point for the application
+- twitter_scraper.py - Core scraping functionality and CLI interface
+- models.py - Database models for storing tweets and searches
+
+### Templates:
+- templates/index.html - Main search page
+- templates/results.html - Results page for displaying tweets
+
+### Static Files:
+- static/css/custom.css - Custom CSS styles
+- static/js/script.js - JavaScript for the web interface
+
+### Documentation:
+- README.md - Project documentation
+- packages_requirements.txt - List of required packages
+- twitter_scraper_cli_examples.txt - Command-line examples
+
+## Required Packages
+```
+snscrape==0.7.0.20230622
+flask==2.3.3
+flask-sqlalchemy==3.1.1
+gunicorn==23.0.0
+pandas==2.1.0
+beautifulsoup4==4.13.0
+lxml==5.3.0
+requests==2.31.0
+psycopg2-binary==2.9.9  # For PostgreSQL support
+```
+
+## Deployment Instructions
+
+1. Create a virtual environment:
+   ```
+   python -m venv venv
+   source venv/bin/activate  # Linux/Mac
+   venv\Scripts\activate     # Windows
+   ```
+
+2. Install the required packages:
+   ```
+   pip install -r packages_requirements.txt
+   ```
+
+3. Set the DATABASE_URL environment variable (if using PostgreSQL):
+   ```
+   export DATABASE_URL=postgres://username:password@host:port/database
+   ```
+
+4. Run the application:
+   ```
+   python main.py
+   ```
+   
+   For production deployment, use gunicorn:
+   ```
+   gunicorn --bind 0.0.0.0:5000 --reuse-port --reload main:app
+   ```
+
+5. Access the application in your browser at http://localhost:5000
+
+## Database Information
+
+The application uses SQLAlchemy ORM with two main models:
+- Tweet - Stores information about individual tweets
+- Search - Stores information about search queries
+
+The application will automatically create the necessary tables when it starts.
+
+## Command-Line Usage
+
+You can also use the Twitter scraper from the command line:
+
+```
+python twitter_scraper.py keyword "climate change" --limit 100 --start-date 2023-01-01 --end-date 2023-06-30 --lang en --format csv
+```
+
+See twitter_scraper_cli_examples.txt for more examples.
