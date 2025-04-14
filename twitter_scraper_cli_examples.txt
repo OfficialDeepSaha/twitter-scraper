@@ -1,0 +1,22 @@
+# Twitter Scraper CLI Examples
+
+## Search by Keyword:
+python twitter_scraper.py keyword "climate change" --limit 100 --start-date 2023-01-01 --end-date 2023-06-30 --lang en --format csv
+
+## Search by Hashtag:
+python twitter_scraper.py hashtag "AI" --limit 50 --format json
+
+## Search by User:
+python twitter_scraper.py user "elonmusk" --limit 200
+
+## Additional Parameters:
+--limit or -l: Maximum number of tweets to retrieve (default: 100)
+--start-date or -s: Start date in YYYY-MM-DD format
+--end-date or -e: End date in YYYY-MM-DD format
+--lang: Language filter (e.g., 'en' for English)
+--output or -o: Output file path
+--format or -f: Output format (csv or json, default: csv)
+
+## Running the Web Interface:
+python app.py
+# Then open browser to http://localhost:5000/
