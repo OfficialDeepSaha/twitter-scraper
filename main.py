@@ -1,9 +1,7 @@
 from app import app, db
+import models  # Import to ensure models are registered with SQLAlchemy
 
 with app.app_context():
-    # Import models to ensure they're registered with SQLAlchemy
-    import models  # noqa: F401
-    
     # Create all tables in the database
     db.create_all()
 

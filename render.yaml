@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: twitter-scraper
+    env: python
+    plan: free
+    buildCommand: ./build.sh
+    startCommand: gunicorn main:app
+    envVars:
+      - key: DATABASE_URL
+        sync: false
+      - key: SESSION_SECRET
+        generateValue: true
+    autoDeploy: true 

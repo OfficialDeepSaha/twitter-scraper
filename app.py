@@ -3,34 +3,21 @@ import json
 from flask import Flask, render_template, request, redirect, url_for, send_file, flash, session
 from twitter_scraper import TwitterScraper
 import logging
-from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy.orm import DeclarativeBase
+from database import db, init_db
 from datetime import datetime
 
 # Configure logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
 
-# Create Flask app and database setup
-class Base(DeclarativeBase):
-    pass
-
-db = SQLAlchemy(model_class=Base)
-
+# Create Flask app
 app = Flask(__name__)
 app.secret_key = os.environ.get("SESSION_SECRET", "twitter-scraper-secret-key")
 
-# Configure the database
-db_url = os.environ.get("DATABASE_URL")
-if db_url is None:
-    db_url = "sqlite:///twitter_scraper.db"  # Fallback to SQLite if no DB URL is provided
-    
-app.config["SQLALCHEMY_DATABASE_URI"] = db_url
-app.config["SQLALCHEMY_ENGINE_OPTIONS"] = {
-    "pool_recycle": 300,
-    "pool_pre_ping": True,
-}
-# Initialize the app with the database extension
-db.init_app(app)
+# Initialize the database
+app = init_db(app)
+
+# Import models here, after db is initialized
+import models
 
 # Initialize the scraper
 scraper = TwitterScraper()
@@ -56,11 +43,8 @@ def search():
         return redirect(url_for('index'))
     
     try:
-        # Import here to avoid circular imports
-        from models import Search, Tweet
-        
         # Create a new search record in the database
-        search_record = Search(
+        search_record = models.Search(
             search_type=search_type,
             query=query,
             limit=limit,
@@ -103,9 +87,9 @@ def search():
         # Store tweets in the database
         for tweet in tweets:
             # Check if this tweet already exists in the database
-            existing_tweet = Tweet.query.get(str(tweet['id']))
+            existing_tweet = models.Tweet.query.get(str(tweet['id']))
             if not existing_tweet:
-                new_tweet = Tweet(
+                new_tweet = models.Tweet(
                     id=str(tweet['id']),
                     date=tweet['date'],
                     content=tweet['content'],
