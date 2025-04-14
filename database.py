@@ -8,13 +8,11 @@ class Base(DeclarativeBase):
 db = SQLAlchemy(model_class=Base)
 
 def init_db(app):
-    # Configure the database
-    db_url = os.environ.get("DATABASE_URL")
-    if db_url is None:
-        db_url = "sqlite:///twitter_scraper.db"  # Fallback to SQLite if no DB URL is provided
-        
+    # Use PostgreSQL database
+    db_url = "postgresql://scrape_twitter_user:q34MX3VwkkpTs9jRquBoedjPRYxdaTqJ@dpg-cvufco9r0fns73823hcg-a.oregon-postgres.render.com/scrape_twitter"
+    
     # Fix Postgres URL for SQLAlchemy 1.4+
-    if db_url and db_url.startswith("postgres://"):
+    if db_url.startswith("postgres://"):
         db_url = db_url.replace("postgres://", "postgresql://", 1)
 
     app.config["SQLALCHEMY_DATABASE_URI"] = db_url

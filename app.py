@@ -11,7 +11,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %
 
 # Create Flask app
 app = Flask(__name__)
-app.secret_key = os.environ.get("SESSION_SECRET", "twitter-scraper-secret-key")
+app.secret_key = "twitter-scraper-secret-key"
 
 # Initialize the database
 app = init_db(app)
@@ -166,6 +166,4 @@ def server_error(e):
     return render_template('index.html', error="Server error, please try again later"), 500
 
 if __name__ == '__main__':
-    # Get port from environment variable or default to 5000
-    port = int(os.environ.get("PORT", 5000))
-    app.run(host='0.0.0.0', port=port, debug=False)
+    app.run(host='0.0.0.0', port=10000, debug=False)

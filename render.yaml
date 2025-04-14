@@ -4,12 +4,5 @@ services:
     env: python
     plan: free
     buildCommand: ./build.sh
-    startCommand: gunicorn --bind 0.0.0.0:$PORT app:app
-    envVars:
-      - key: DATABASE_URL
-        sync: false
-      - key: SESSION_SECRET
-        generateValue: true
-      - key: PORT
-        sync: false
+    startCommand: gunicorn --bind 0.0.0.0:10000 app:app
     autoDeploy: true 
